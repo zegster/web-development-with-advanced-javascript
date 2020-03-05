@@ -21,6 +21,8 @@ import "semantic-ui-css/semantic.min.css";
 /* CSS */
 import "./App.css";
 
+const peopleUrl = "https://swapi.co/api/people/1";
+
 const App = () => {
     return (
         <>
@@ -28,14 +30,28 @@ const App = () => {
                 <Router>
                     <NavBar />
                     <Switch>
-                        <Route exact path="/" component={HomePage} />
+                        <Route
+                            exact
+                            path="/"
+                            render={(props) => <HomePage {...props} />}
+                        />
                         <Route
                             exact
                             path="/character"
-                            component={CharacterPage}
+                            render={(props) => (
+                                <CharacterPage {...props} url={peopleUrl} />
+                            )}
                         />
-                        <Route exact path="/film" component={FilmPage} />
-                        <Route exact path="/planet" component={PlanetPage} />
+                        <Route
+                            exact
+                            path="/film"
+                            render={(props) => <FilmPage {...props} />}
+                        />
+                        <Route
+                            exact
+                            path="/planet"
+                            render={(props) => <PlanetPage {...props} />}
+                        />
                         <Redirect to="/" />
                     </Switch>
                 </Router>

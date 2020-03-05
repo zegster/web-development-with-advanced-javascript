@@ -19,66 +19,92 @@ import "semantic-ui-css/semantic.min.css";
 /* CSS */
 import "./index.css";
 
-/* Reference
-// const baseUrl = "https://jsonplaceholder.typicode.com/photos";
-# https://www.youtube.com/watch?v=EC5ZvP87P2k&t=307s
-# https://www.youtube.com/watch?v=SwDK0-heAn4
-# https://www.youtube.com/watch?v=rDVe6pmeAjo
-*/
+const Search = (props) => {
+    console.log(props.target.value);
+};
 
-const CharacterPage = () => {
+const DetailCharacterCard = (props) => {
+    return (
+        <>
+            <Card.Group stackable itemsPerRow={props.item_number}>
+                {props.item.flat().map((character, index) => (
+                    <Card key={index} color="teal">
+                        <Card.Content>
+                            <Card.Header>{character.name}</Card.Header>
+                            <Card.Meta>{character.url}</Card.Meta>
+                            <Card.Description>
+                                <List>
+                                    <List.Item>
+                                        <strong>Gender: </strong>
+                                        {character.gender}
+                                    </List.Item>
+
+                                    <List.Item>
+                                        <strong>Birth Year: </strong>
+                                        {character.birth_year}
+                                    </List.Item>
+
+                                    <List.Item>
+                                        <strong>Height: </strong>
+                                        {character.height}
+                                    </List.Item>
+
+                                    <List.Item>
+                                        <strong>Homeworld: </strong>
+                                        {character.homeworld}
+                                    </List.Item>
+
+                                    <List.Item>
+                                        <strong>Films:</strong>
+
+                                        <List.List>
+                                            {character.films.map((f, index) => (
+                                                <List.Item key={index}>
+                                                    {f}
+                                                </List.Item>
+                                            ))}
+                                        </List.List>
+                                    </List.Item>
+                                </List>
+                            </Card.Description>
+                        </Card.Content>
+                    </Card>
+                ))}
+            </Card.Group>
+        </>
+    );
+};
+
+const CharacterPage = (props) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isError, setIsError] = useState(false);
     const [characters, setCharacters] = useState([]);
-    // const [homeworld, setHomeworld] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const baseUrl = `https://swapi.co/api/people/?format=json&page=${currentPage}`;
 
-    const nextPage = () => {
-        setIsLoading(true);
-        setCurrentPage(currentPage + 1);
-    };
+    const getCharacter = async () => {
+        let baseUrl = "https://swapi.co/api/people/";
+        let jsonResult = [];
 
-    const previousPage = () => {
-        setIsLoading(true);
-        if (currentPage <= 1) setCurrentPage(1);
-        else setCurrentPage(currentPage - 1);
+        do {
+            try {
+                const res = await axios.get(baseUrl);
+
+                baseUrl = res.data.next;
+                jsonResult.push(res.data.results);
+            } catch (err) {
+                setIsLoading(false);
+                setIsError(true);
+            }
+        } while (baseUrl);
+
+        setCharacters(jsonResult);
+        setIsLoading(false);
     };
 
     useEffect(() => {
-        const getCharacter = async () => {
-            await axios
-                .get(baseUrl)
-                .then((res) => {
-                    const c = res.data.results;
-                    setCharacters(c);
-                    setIsLoading(false);
-                    console.log("From getCharacter!!!");
-                    console.log(c.map((f) => f.films));
-                })
-                .catch((error) => {
-                    setIsError(true);
-                    console.log(error);
-                });
-        };
-
-        const getHomeWorld = async () => {
-            // console.log(characters.map((f) => f.films));
-            // characters.map((f) => console.log({ f }));
-            // await axios
-            //     .get(baseUrl)
-            //     .then((res) => {
-            //         const homeworlds = res.data.results;
-            //         setHomeworld(homeworlds);
-            //     })
-            //     .catch((error) => {
-            //         console.log(error);
-            //     });
-        };
-
-        getCharacter();
-        //getHomeWorld();
-    }, [baseUrl]);
+        if (characters.length === 0) {
+            getCharacter();
+        }
+    });
 
     return (
         <>
@@ -91,27 +117,11 @@ const CharacterPage = () => {
 
                 <Menu.Menu position="right">
                     <Menu.Item>
-                        <Input icon="search" placeholder="Search..." />
-                    </Menu.Item>
-
-                    <Menu.Item>
-                        <Dimmer
-                            className={
-                                isLoading === true ? "active" : "disabled"
-                            }
-                        >
-                            <Loader size="mini" />
-                        </Dimmer>
-
-                        <Button.Group widths="2">
-                            <Button onClick={previousPage}>
-                                <Icon name="arrow left" />
-                            </Button>
-
-                            <Button onClick={nextPage}>
-                                <Icon name="arrow right" />
-                            </Button>
-                        </Button.Group>
+                        <Input
+                            icon="search"
+                            placeholder="Search..."
+                            onChange={Search}
+                        />
                     </Menu.Item>
                 </Menu.Menu>
             </Menu>
@@ -135,53 +145,18 @@ const CharacterPage = () => {
                     <Loader>Loading</Loader>
                 </Dimmer>
 
-                <Card.Group stackable itemsPerRow={3}>
-                    {characters.map((character, index) => (
-                        <Card key={index} color="teal">
-                            <Card.Content>
-                                <Card.Header>{character.name}</Card.Header>
-                                <Card.Meta>{character.url}</Card.Meta>
-                                <Card.Description>
-                                    <List>
-                                        <List.Item>
-                                            <strong>Gender: </strong>
-                                            {character.gender}
-                                        </List.Item>
+                {/* <button onclick={setboolean}>see more?</button>
+                {getOptions()} */}
 
-                                        <List.Item>
-                                            <strong>Birth Year: </strong>
-                                            {character.birth_year}
-                                        </List.Item>
+                {/* const getOptions = choice => {
+                    switch (choice) {
+                        case1: <div> hi</div>
+                        case2: <> WHATEVER </>
+                        case3:
+                    }
+                } */}
 
-                                        <List.Item>
-                                            <strong>Height: </strong>
-                                            {character.height}
-                                        </List.Item>
-
-                                        <List.Item>
-                                            <strong>Homeworld: </strong>
-                                            {character.homeworld}
-                                        </List.Item>
-
-                                        <List.Item>
-                                            <strong>Films:</strong>
-
-                                            <List.List>
-                                                {character.films.map(
-                                                    (f, index) => (
-                                                        <List.Item key={index}>
-                                                            {f}
-                                                        </List.Item>
-                                                    )
-                                                )}
-                                            </List.List>
-                                        </List.Item>
-                                    </List>
-                                </Card.Description>
-                            </Card.Content>
-                        </Card>
-                    ))}
-                </Card.Group>
+                <DetailCharacterCard item={characters} item_number={3} />
             </Segment>
         </>
     );

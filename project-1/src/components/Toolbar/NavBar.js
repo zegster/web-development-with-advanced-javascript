@@ -1,7 +1,7 @@
 /* Import 3rd Party Library */
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Input, Menu, Responsive, Segment, Sidebar } from "semantic-ui-react";
+import { Menu, Responsive, Segment, Sidebar } from "semantic-ui-react";
 
 /* Import 3rd Party CSS */
 import "semantic-ui-css/semantic.min.css";
@@ -49,12 +49,6 @@ const MobileNavBar = () => {
                             icon="bars"
                             onClick={() => setVisibleSideBar(true)}
                         />
-
-                        <Menu.Menu position="right">
-                            <Menu.Item>
-                                <Input icon="search" placeholder="Search..." />
-                            </Menu.Item>
-                        </Menu.Menu>
                     </Menu>
                 </Segment>
 
