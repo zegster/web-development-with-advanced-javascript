@@ -45,10 +45,7 @@ const MobileNavBar = () => {
             <Responsive {...Responsive.onlyMobile}>
                 <Segment className="sharp-border" inverted>
                     <Menu secondary inverted borderless icon>
-                        <Menu.Item
-                            icon="bars"
-                            onClick={() => setVisibleSideBar(true)}
-                        />
+                        <Menu.Item icon="bars" onClick={() => setVisibleSideBar(true)} />
                     </Menu>
                 </Segment>
 

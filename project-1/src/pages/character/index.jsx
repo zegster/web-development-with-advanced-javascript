@@ -1,17 +1,5 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import {
-    Button,
-    Card,
-    Dimmer,
-    Header,
-    Icon,
-    Input,
-    List,
-    Loader,
-    Menu,
-    Segment
-} from "semantic-ui-react";
+import React from "react";
+import { Card, Dimmer, Header, Icon, Input, List, Loader, Menu, Segment } from "semantic-ui-react";
 
 /* Import 3rd Party CSS */
 import "semantic-ui-css/semantic.min.css";
@@ -23,44 +11,43 @@ const Search = (props) => {
     console.log(props.target.value);
 };
 
-const DetailCharacterCard = (props) => {
+const CharacterCard = (props) => {
     return (
         <>
-            <Card.Group stackable itemsPerRow={props.item_number}>
-                {props.item.flat().map((character, index) => (
+            <Card.Group stackable itemsPerRow={3}>
+                {props.characterApiData.flat().map((characterApi, index) => (
                     <Card key={index} color="teal">
                         <Card.Content>
-                            <Card.Header>{character.name}</Card.Header>
-                            <Card.Meta>{character.url}</Card.Meta>
+                            <Card.Header>{characterApi.name}</Card.Header>
+                            <Card.Meta>{characterApi.url}</Card.Meta>
                             <Card.Description>
                                 <List>
                                     <List.Item>
                                         <strong>Gender: </strong>
-                                        {character.gender}
+                                        {characterApi.gender}
                                     </List.Item>
 
                                     <List.Item>
                                         <strong>Birth Year: </strong>
-                                        {character.birth_year}
+                                        {characterApi.birth_year}
                                     </List.Item>
 
                                     <List.Item>
                                         <strong>Height: </strong>
-                                        {character.height}
+                                        {characterApi.height}
                                     </List.Item>
 
                                     <List.Item>
                                         <strong>Homeworld: </strong>
-                                        {character.homeworld}
+                                        {props.planetApiData.flat().map((planetApi) => planetApi.url === characterApi.homeworld && planetApi.name)}
                                     </List.Item>
 
                                     <List.Item>
                                         <strong>Films:</strong>
-
                                         <List.List>
-                                            {character.films.map((f, index) => (
+                                            {characterApi.films.map((film, index) => (
                                                 <List.Item key={index}>
-                                                    {f}
+                                                    {props.filmApiData.flat().map((filmApi) => filmApi.url === film && filmApi.title)}
                                                 </List.Item>
                                             ))}
                                         </List.List>
@@ -76,36 +63,6 @@ const DetailCharacterCard = (props) => {
 };
 
 const CharacterPage = (props) => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [isError, setIsError] = useState(false);
-    const [characters, setCharacters] = useState([]);
-
-    const getCharacter = async () => {
-        let baseUrl = "https://swapi.co/api/people/";
-        let jsonResult = [];
-
-        do {
-            try {
-                const res = await axios.get(baseUrl);
-
-                baseUrl = res.data.next;
-                jsonResult.push(res.data.results);
-            } catch (err) {
-                setIsLoading(false);
-                setIsError(true);
-            }
-        } while (baseUrl);
-
-        setCharacters(jsonResult);
-        setIsLoading(false);
-    };
-
-    useEffect(() => {
-        if (characters.length === 0) {
-            getCharacter();
-        }
-    });
-
     return (
         <>
             <Menu className="sharp-border" inverted borderless stackable>
@@ -117,46 +74,26 @@ const CharacterPage = (props) => {
 
                 <Menu.Menu position="right">
                     <Menu.Item>
-                        <Input
-                            icon="search"
-                            placeholder="Search..."
-                            onChange={Search}
-                        />
+                        <Input icon="search" placeholder="Search..." onChange={Search} />
                     </Menu.Item>
                 </Menu.Menu>
             </Menu>
 
-            <Segment
-                inverted
-                color="yellow"
-                textAlign="center"
-                className={isError === true ? null : "hidden"}
-            >
+            <Segment inverted color="yellow" textAlign="center" className={props.isError === true ? null : "hidden"}>
                 <Header as="h2">
                     <Header.Content>
                         <Icon name="warning sign" />
-                        Error: API Call is stalling!
+                        Error: API call failed!
                     </Header.Content>
                 </Header>
             </Segment>
 
             <Segment placeholder className="transparent">
-                <Dimmer className={isLoading === true ? "active" : "disabled"}>
+                <Dimmer className={props.isLoading === true ? "active" : "disabled"}>
                     <Loader>Loading</Loader>
                 </Dimmer>
 
-                {/* <button onclick={setboolean}>see more?</button>
-                {getOptions()} */}
-
-                {/* const getOptions = choice => {
-                    switch (choice) {
-                        case1: <div> hi</div>
-                        case2: <> WHATEVER </>
-                        case3:
-                    }
-                } */}
-
-                <DetailCharacterCard item={characters} item_number={3} />
+                <CharacterCard characterApiData={props.characterApiData} planetApiData={props.planetApiData} filmApiData={props.filmApiData} />
             </Segment>
         </>
     );

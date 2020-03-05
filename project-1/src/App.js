@@ -1,12 +1,9 @@
 /* Import 3rd Party Library */
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
+import NodeCache from "node-cache";
 import { Container } from "semantic-ui-react";
-import {
-    BrowserRouter as Router,
-    Route, //render some UI when its path matches the current URL
-    Switch, //switch between routes
-    Redirect //navigate to a new location
-} from "react-router-dom";
 
 /* Import Components */
 import NavBar from "./components/Toolbar/NavBar";
@@ -21,9 +18,92 @@ import "semantic-ui-css/semantic.min.css";
 /* CSS */
 import "./App.css";
 
-const peopleUrl = "https://swapi.co/api/people/1";
-
+const appCache = new NodeCache();
 const App = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [isError, setIsError] = useState(false);
+    const [characters, setCharacters] = useState([]);
+    const [films, setFilms] = useState([]);
+    const [planets, setPlanets] = useState([]);
+
+    const getCharacter = async () => {
+        setIsLoading(true);
+        let baseUrl = "https://swapi.co/api/people/";
+        let jsonResult = [];
+
+        do {
+            try {
+                const res = await axios.get(baseUrl);
+
+                baseUrl = res.data.next;
+                jsonResult.push(res.data.results);
+            } catch (err) {
+                setIsLoading(false);
+                setIsError(true);
+            }
+        } while (baseUrl);
+
+        setCharacters(jsonResult);
+        setIsLoading(false);
+        appCache.set("characters", jsonResult);
+    };
+
+    const getFilm = async () => {
+        setIsLoading(true);
+        let baseUrl = "https://swapi.co/api/films/";
+        let jsonResult = [];
+
+        do {
+            try {
+                const res = await axios.get(baseUrl);
+
+                baseUrl = res.data.next;
+                jsonResult.push(res.data.results);
+            } catch (err) {
+                setIsLoading(false);
+                setIsError(true);
+            }
+        } while (baseUrl);
+
+        setFilms(jsonResult);
+        setIsLoading(false);
+    };
+
+    const getPlanet = async () => {
+        setIsLoading(true);
+        let baseUrl = "https://swapi.co/api/planets/";
+        let jsonResult = [];
+
+        do {
+            try {
+                const res = await axios.get(baseUrl);
+
+                baseUrl = res.data.next;
+                jsonResult.push(res.data.results);
+            } catch (err) {
+                setIsLoading(false);
+                setIsError(true);
+            }
+        } while (baseUrl);
+
+        setPlanets(jsonResult);
+        setIsLoading(false);
+    };
+
+    useEffect(() => {
+        if (appCache.get("characters") === undefined) {
+            getCharacter();
+        }
+
+        if (films.length === 0) {
+            getFilm();
+        }
+
+        if (planets.length === 0) {
+            getPlanet();
+        }
+    });
+
     return (
         <>
             <Container>
@@ -33,24 +113,49 @@ const App = () => {
                         <Route
                             exact
                             path="/"
-                            render={(props) => <HomePage {...props} />}
+                            render={(props) => <HomePage {...props} apiData={characters} isLoading={isLoading} isError={isError} />}
                         />
                         <Route
                             exact
                             path="/character"
                             render={(props) => (
-                                <CharacterPage {...props} url={peopleUrl} />
+                                <CharacterPage
+                                    {...props}
+                                    characterApiData={characters}
+                                    filmApiData={films}
+                                    planetApiData={planets}
+                                    isLoading={isLoading}
+                                    isError={isError}
+                                />
                             )}
                         />
                         <Route
                             exact
                             path="/film"
-                            render={(props) => <FilmPage {...props} />}
+                            render={(props) => (
+                                <FilmPage
+                                    {...props}
+                                    characterApiData={characters}
+                                    filmApiData={films}
+                                    planetApiData={planets}
+                                    isLoading={isLoading}
+                                    isError={isError}
+                                />
+                            )}
                         />
                         <Route
                             exact
                             path="/planet"
-                            render={(props) => <PlanetPage {...props} />}
+                            render={(props) => (
+                                <PlanetPage
+                                    {...props}
+                                    characterApiData={characters}
+                                    filmApiData={films}
+                                    planetApiData={planets}
+                                    isLoading={isLoading}
+                                    isError={isError}
+                                />
+                            )}
                         />
                         <Redirect to="/" />
                     </Switch>
