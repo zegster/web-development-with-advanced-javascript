@@ -22,7 +22,7 @@ const appCache = new NodeCache();
 const App = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isError, setIsError] = useState(false);
-    const [characters, setCharacters] = useState([]);
+    const [characters, setCharacters] = useState(appCache.get("characters") || []);
     const [films, setFilms] = useState([]);
     const [planets, setPlanets] = useState([]);
 
@@ -34,7 +34,6 @@ const App = () => {
         do {
             try {
                 const res = await axios.get(baseUrl);
-
                 baseUrl = res.data.next;
                 jsonResult.push(res.data.results);
             } catch (err) {

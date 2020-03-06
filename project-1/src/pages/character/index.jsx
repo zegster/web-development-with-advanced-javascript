@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Dimmer, Header, Icon, Input, List, Loader, Menu, Segment } from "semantic-ui-react";
+import { Button, Card, Dimmer, Header, Icon, Input, List, Loader, Menu, Modal, Segment } from "semantic-ui-react";
 
 /* Import 3rd Party CSS */
 import "semantic-ui-css/semantic.min.css";
@@ -23,41 +23,72 @@ const CharacterCard = (props) => {
                             <Card.Description>
                                 <List>
                                     <List.Item>
-                                        <strong>Gender: </strong>
-                                        {characterApi.gender}
-                                    </List.Item>
-
-                                    <List.Item>
                                         <strong>Birth Year: </strong>
                                         {characterApi.birth_year}
                                     </List.Item>
 
                                     <List.Item>
-                                        <strong>Height: </strong>
-                                        {characterApi.height}
+                                        <strong>Gender: </strong>
+                                        {characterApi.gender}
                                     </List.Item>
 
                                     <List.Item>
-                                        <strong>Homeworld: </strong>
-                                        {props.planetApiData.flat().map((planetApi) => planetApi.url === characterApi.homeworld && planetApi.name)}
-                                    </List.Item>
-
-                                    <List.Item>
-                                        <strong>Films:</strong>
-                                        <List.List>
-                                            {characterApi.films.map((film, index) => (
-                                                <List.Item key={index}>
-                                                    {props.filmApiData.flat().map((filmApi) => filmApi.url === film && filmApi.title)}
-                                                </List.Item>
-                                            ))}
-                                        </List.List>
+                                        <strong>Mass: </strong>
+                                        {characterApi.mass}
                                     </List.Item>
                                 </List>
                             </Card.Description>
                         </Card.Content>
+                        <Card.Content extra>
+                            <DetailCharacterCard characterApi={characterApi} planetApiData={props.planetApiData} filmApiData={props.filmApiData} />
+                        </Card.Content>
                     </Card>
                 ))}
             </Card.Group>
+        </>
+    );
+};
+
+const DetailCharacterCard = (props) => {
+    const attributes = ["height", "mass", "hair_color", "skin_color", "eye_color", "birth_year", "gender"];
+    const capitalizeWords = (word) => {
+        return word.replace(/\w\S*/g, function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    };
+
+    return (
+        <>
+            <Modal trigger={<Button floated="right" circular icon="info" />}>
+                <Modal.Header>{props.characterApi.name}</Modal.Header>
+                <Modal.Content>
+                    <Modal.Description>
+                        {attributes.map((attribute, index) => (
+                            <p key={index}>
+                                <strong>{capitalizeWords(attribute)}: </strong>
+                                {props.characterApi[attribute]}
+                            </p>
+                        ))}
+
+                        <p>
+                            <strong>Homeworld: </strong>
+                            {props.planetApiData.flat().map((planetApi) => planetApi.url === props.characterApi.homeworld && planetApi.name)}
+                        </p>
+                        <List>
+                            <List.Item>
+                                <strong>Films: </strong>
+                                <List.List>
+                                    {props.characterApi.films.map((film, index) => (
+                                        <List.Item key={index}>
+                                            {props.filmApiData.flat().map((filmApi) => filmApi.url === film && filmApi.title)}
+                                        </List.Item>
+                                    ))}
+                                </List.List>
+                            </List.Item>
+                        </List>
+                    </Modal.Description>
+                </Modal.Content>
+            </Modal>
         </>
     );
 };
