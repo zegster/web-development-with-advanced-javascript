@@ -11,9 +11,7 @@ import "./NavBar.css";
 
 const pages = ["home", "character", "film", "planet"];
 
-const DesktopNavBar = () => {
-    const [activeItem, setActiveItem] = useState("home");
-
+const DesktopNavBar = (props) => {
     return (
         <>
             <Responsive {...Responsive.onlyComputer}>
@@ -26,8 +24,8 @@ const DesktopNavBar = () => {
                             to={page}
                             icon={page === pages[0] ? page : null}
                             name={page === pages[0] ? null : page}
-                            active={activeItem === page}
-                            onClick={() => setActiveItem(page)}
+                            active={props.activeItem === page}
+                            onClick={() => props.setActiveItem(page)}
                         />
                     ))}
                 </Menu>
@@ -36,8 +34,7 @@ const DesktopNavBar = () => {
     );
 };
 
-const MobileNavBar = () => {
-    const [activeItem, setActiveItem] = useState("home");
+const MobileNavBar = (props) => {
     const [visibleSideBar, setVisibleSideBar] = useState(false);
 
     return (
@@ -67,8 +64,8 @@ const MobileNavBar = () => {
                             as={Link}
                             to={page}
                             name={page}
-                            active={activeItem === page}
-                            onClick={() => setActiveItem(page)}
+                            active={props.activeItem === page}
+                            onClick={() => props.setActiveItem(page)}
                         />
                     ))}
                 </Sidebar>
@@ -77,11 +74,14 @@ const MobileNavBar = () => {
     );
 };
 
-const ResponsiveNavBar = () => (
-    <>
-        <DesktopNavBar />
-        <MobileNavBar />
-    </>
-);
+const ResponsiveNavBar = () => {
+    const [activeItem, setActiveItem] = useState("home");
+    return (
+        <>
+            <DesktopNavBar activeItem={activeItem} setActiveItem={setActiveItem} />
+            <MobileNavBar activeItem={activeItem} setActiveItem={setActiveItem} />
+        </>
+    );
+};
 
 export default ResponsiveNavBar;

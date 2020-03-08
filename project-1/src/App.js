@@ -22,15 +22,17 @@ const appCache = new NodeCache();
 const App = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isError, setIsError] = useState(false);
+
     const [characters, setCharacters] = useState(appCache.get("characters") || []);
-    const [charactersClone, setCharactersClone] = useState([]);
     const [films, setFilms] = useState(appCache.get("films") || []);
-    const [filmsClone, setFilmsClone] = useState([]);
     const [planets, setPlanets] = useState(appCache.get("planets") || []);
+
+    const [charactersClone, setCharactersClone] = useState([]);
+    const [filmsClone, setFilmsClone] = useState([]);
     const [planetsClone, setPlanetsClone] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const getCharacter = async () => {
-        setIsLoading(true);
         let baseUrl = "https://swapi.co/api/people/";
         let jsonResult = [];
 
@@ -47,12 +49,10 @@ const App = () => {
 
         setCharacters(jsonResult);
         setCharactersClone(jsonResult);
-        setIsLoading(false);
         appCache.set("characters", jsonResult);
     };
 
     const getFilm = async () => {
-        setIsLoading(true);
         let baseUrl = "https://swapi.co/api/films/";
         let jsonResult = [];
 
@@ -70,12 +70,10 @@ const App = () => {
 
         setFilms(jsonResult);
         setFilmsClone(jsonResult);
-        setIsLoading(false);
         appCache.set("films", jsonResult);
     };
 
     const getPlanet = async () => {
-        setIsLoading(true);
         let baseUrl = "https://swapi.co/api/planets/";
         let jsonResult = [];
 
@@ -93,14 +91,14 @@ const App = () => {
 
         setPlanets(jsonResult);
         setPlanetsClone(jsonResult);
-        setIsLoading(false);
         appCache.set("planets", jsonResult);
     };
 
     const searchCharacter = (props) => {
         let findCharacter = charactersClone.flat().filter((character) => {
-            const lowerCase = character.name.toLowerCase();
-            return lowerCase.includes(props.target.value);
+            const source = character.name.toLowerCase();
+            const toSearch = props.target.value.toLowerCase();
+            return source.includes(toSearch);
         });
 
         setCharacters(findCharacter);
@@ -111,8 +109,9 @@ const App = () => {
 
     const searchFilm = (props) => {
         let findFilm = filmsClone.flat().filter((film) => {
-            const lowerCase = film.title.toLowerCase();
-            return lowerCase.includes(props.target.value);
+            const source = film.title.toLowerCase();
+            const toSearch = props.target.value.toLowerCase();
+            return source.includes(toSearch);
         });
 
         setFilms(findFilm);
@@ -123,14 +122,22 @@ const App = () => {
 
     const searchPlanet = (props) => {
         let findPlanet = planetsClone.flat().filter((planet) => {
-            const lowerCase = planet.name.toLowerCase();
-            return lowerCase.includes(props.target.value);
+            const source = planet.name.toLowerCase();
+            const toSearch = props.target.value.toLowerCase();
+            return source.includes(toSearch);
         });
 
-        setFilms(findPlanet);
+        setPlanets(findPlanet);
         if (props.target.value === "") {
-            setFilms(planetsClone);
+            setPlanets(planetsClone);
         }
+    };
+
+    const searchFunction = (props) => {
+        setSearchTerm(props.target.value.toLowerCase());
+        searchCharacter(props);
+        searchFilm(props);
+        searchPlanet(props);
     };
 
     useEffect(() => {
@@ -145,7 +152,11 @@ const App = () => {
         if (appCache.get("planets") === undefined) {
             getPlanet();
         }
-    });
+
+        if (characters.length !== 0 && films.length !== 0 && planets.length !== 0) {
+            setIsLoading(false);
+        }
+    }, [characters.length, films.length, planets.length]);
 
     return (
         <>
@@ -167,7 +178,8 @@ const App = () => {
                                     characterApiData={characters}
                                     filmApiData={films}
                                     planetApiData={planets}
-                                    searchFunction={searchCharacter}
+                                    searchTerm={searchTerm}
+                                    searchFunction={searchFunction}
                                     isLoading={isLoading}
                                     isError={isError}
                                 />
@@ -182,7 +194,8 @@ const App = () => {
                                     characterApiData={characters}
                                     filmApiData={films}
                                     planetApiData={planets}
-                                    searchFunction={searchFilm}
+                                    searchTerm={searchTerm}
+                                    searchFunction={searchFunction}
                                     isLoading={isLoading}
                                     isError={isError}
                                 />
@@ -197,7 +210,8 @@ const App = () => {
                                     characterApiData={characters}
                                     filmApiData={films}
                                     planetApiData={planets}
-                                    searchFunction={searchPlanet}
+                                    searchTerm={searchTerm}
+                                    searchFunction={searchFunction}
                                     isLoading={isLoading}
                                     isError={isError}
                                 />

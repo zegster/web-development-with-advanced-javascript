@@ -1,3 +1,4 @@
+/* Import 3rd Party Library */
 import React from "react";
 import { Button, Card, Dimmer, Grid, Header, Icon, List, Loader, Modal, Segment } from "semantic-ui-react";
 
@@ -110,7 +111,7 @@ const DetailCard = (props) => {
 const FilmPage = (props) => {
     return (
         <>
-            <SearchBar title="Film" isLoading={props.isLoading} searchFunction={props.searchFunction} />
+            <SearchBar title="Film" isLoading={props.isLoading} searchTerm={props.searchTerm} searchFunction={props.searchFunction} />
 
             <Segment inverted color="yellow" textAlign="center" className={props.isError === true ? null : "hidden"}>
                 <Header as="h2">

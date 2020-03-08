@@ -11,13 +11,7 @@
 ::-webkit-scrollbar-track {
     background-color: #000;
     border-radius: 10px;
-    background: linear-gradient(
-        to top,
-        #201c29,
-        #201c29 1px,
-        #100e17 1px,
-        #100e17
-    );
+    background: linear-gradient(to top, #201c29, #201c29 1px, #100e17 1px, #100e17);
 }
 
 * {
@@ -30,6 +24,9 @@ html {
 }
 
 body {
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    background-attachment: fixed !important;
     background-color: #191919 !important;
-    background-image: linear-gradient(to top, #8e9eab, #99aab8, #8e9eab) !important;
+    background-image: linear-gradient(to top, #0f2027, #203a43, #0f2027) !important;
 }
