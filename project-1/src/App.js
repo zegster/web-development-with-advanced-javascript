@@ -6,7 +6,7 @@ import NodeCache from "node-cache";
 import { Container } from "semantic-ui-react";
 
 /* Import Components */
-import NavBar from "./components/Toolbar/NavBar";
+import NavBar from "./components/NavBar/NavBar";
 import HomePage from "./pages/home";
 import CharacterPage from "./pages/character";
 import FilmPage from "./pages/film";
@@ -23,8 +23,11 @@ const App = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isError, setIsError] = useState(false);
     const [characters, setCharacters] = useState(appCache.get("characters") || []);
-    const [films, setFilms] = useState([]);
-    const [planets, setPlanets] = useState([]);
+    const [charactersClone, setCharactersClone] = useState([]);
+    const [films, setFilms] = useState(appCache.get("films") || []);
+    const [filmsClone, setFilmsClone] = useState([]);
+    const [planets, setPlanets] = useState(appCache.get("planets") || []);
+    const [planetsClone, setPlanetsClone] = useState([]);
 
     const getCharacter = async () => {
         setIsLoading(true);
@@ -43,6 +46,7 @@ const App = () => {
         } while (baseUrl);
 
         setCharacters(jsonResult);
+        setCharactersClone(jsonResult);
         setIsLoading(false);
         appCache.set("characters", jsonResult);
     };
@@ -65,7 +69,9 @@ const App = () => {
         } while (baseUrl);
 
         setFilms(jsonResult);
+        setFilmsClone(jsonResult);
         setIsLoading(false);
+        appCache.set("films", jsonResult);
     };
 
     const getPlanet = async () => {
@@ -86,7 +92,45 @@ const App = () => {
         } while (baseUrl);
 
         setPlanets(jsonResult);
+        setPlanetsClone(jsonResult);
         setIsLoading(false);
+        appCache.set("planets", jsonResult);
+    };
+
+    const searchCharacter = (props) => {
+        let findCharacter = charactersClone.flat().filter((character) => {
+            const lowerCase = character.name.toLowerCase();
+            return lowerCase.includes(props.target.value);
+        });
+
+        setCharacters(findCharacter);
+        if (props.target.value === "") {
+            setCharacters(charactersClone);
+        }
+    };
+
+    const searchFilm = (props) => {
+        let findFilm = filmsClone.flat().filter((film) => {
+            const lowerCase = film.title.toLowerCase();
+            return lowerCase.includes(props.target.value);
+        });
+
+        setFilms(findFilm);
+        if (props.target.value === "") {
+            setFilms(filmsClone);
+        }
+    };
+
+    const searchPlanet = (props) => {
+        let findPlanet = planetsClone.flat().filter((planet) => {
+            const lowerCase = planet.name.toLowerCase();
+            return lowerCase.includes(props.target.value);
+        });
+
+        setFilms(findPlanet);
+        if (props.target.value === "") {
+            setFilms(planetsClone);
+        }
     };
 
     useEffect(() => {
@@ -94,11 +138,11 @@ const App = () => {
             getCharacter();
         }
 
-        if (films.length === 0) {
+        if (appCache.get("films") === undefined) {
             getFilm();
         }
 
-        if (planets.length === 0) {
+        if (appCache.get("planets") === undefined) {
             getPlanet();
         }
     });
@@ -123,6 +167,7 @@ const App = () => {
                                     characterApiData={characters}
                                     filmApiData={films}
                                     planetApiData={planets}
+                                    searchFunction={searchCharacter}
                                     isLoading={isLoading}
                                     isError={isError}
                                 />
@@ -137,6 +182,7 @@ const App = () => {
                                     characterApiData={characters}
                                     filmApiData={films}
                                     planetApiData={planets}
+                                    searchFunction={searchFilm}
                                     isLoading={isLoading}
                                     isError={isError}
                                 />
@@ -151,6 +197,7 @@ const App = () => {
                                     characterApiData={characters}
                                     filmApiData={films}
                                     planetApiData={planets}
+                                    searchFunction={searchPlanet}
                                     isLoading={isLoading}
                                     isError={isError}
                                 />

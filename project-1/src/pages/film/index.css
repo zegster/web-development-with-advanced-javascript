@@ -1,0 +1,13 @@
+.sharp-border {
+    border-radius: 0 0 0 0 !important;
+}
+
+.hidden {
+    display: none;
+}
+
+.transparent {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
