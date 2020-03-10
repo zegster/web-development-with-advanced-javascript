@@ -23,7 +23,7 @@ const App = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isError, setIsError] = useState(false);
 
-    const [characters, setCharacters] = useState(appCache.get("characters") || []);
+    const [characters, setCharacters] = useState(appCache.get("peoples") || []);
     const [films, setFilms] = useState(appCache.get("films") || []);
     const [planets, setPlanets] = useState(appCache.get("planets") || []);
 
@@ -32,8 +32,8 @@ const App = () => {
     const [planetsClone, setPlanetsClone] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
 
-    const getCharacter = async () => {
-        let baseUrl = "https://swapi.co/api/people/";
+    const getApiData = async (subUrl, setData, setClone) => {
+        let baseUrl = `https://swapi.co/api/${subUrl}`;
         let jsonResult = [];
 
         do {
@@ -47,57 +47,23 @@ const App = () => {
             }
         } while (baseUrl);
 
-        setCharacters(jsonResult);
-        setCharactersClone(jsonResult);
-        appCache.set("characters", jsonResult);
+        setData(jsonResult);
+        setClone(jsonResult);
+        appCache.set(subUrl, jsonResult);
     };
 
-    const getFilm = async () => {
-        let baseUrl = "https://swapi.co/api/films/";
-        let jsonResult = [];
-
-        do {
-            try {
-                const res = await axios.get(baseUrl);
-
-                baseUrl = res.data.next;
-                jsonResult.push(res.data.results);
-            } catch (err) {
-                setIsLoading(false);
-                setIsError(true);
-            }
-        } while (baseUrl);
-
-        setFilms(jsonResult);
-        setFilmsClone(jsonResult);
-        appCache.set("films", jsonResult);
-    };
-
-    const getPlanet = async () => {
-        let baseUrl = "https://swapi.co/api/planets/";
-        let jsonResult = [];
-
-        do {
-            try {
-                const res = await axios.get(baseUrl);
-
-                baseUrl = res.data.next;
-                jsonResult.push(res.data.results);
-            } catch (err) {
-                setIsLoading(false);
-                setIsError(true);
-            }
-        } while (baseUrl);
-
-        setPlanets(jsonResult);
-        setPlanetsClone(jsonResult);
-        appCache.set("planets", jsonResult);
-    };
-
+    /* Searching Function: search all the "occurrence" words.
+    It may sometime look like a false search, but it is not because not all attribute is displayed on the website but the data is still there. */
     const searchCharacter = (props) => {
         let findCharacter = charactersClone.flat().filter((character) => {
-            const source = character.name.toLowerCase();
-            const toSearch = props.target.value.toLowerCase();
+            let source, toSearch;
+            for (const key in character) {
+                source = typeof character[key] === "string" ? character[key].toLowerCase() : "";
+                toSearch = props.target.value.toLowerCase();
+                if (source.includes(toSearch)) {
+                    break;
+                }
+            }
             return source.includes(toSearch);
         });
 
@@ -105,12 +71,19 @@ const App = () => {
         if (props.target.value === "") {
             setCharacters(charactersClone);
         }
+        setSearchTerm(props.target.value.toLowerCase());
     };
 
     const searchFilm = (props) => {
         let findFilm = filmsClone.flat().filter((film) => {
-            const source = film.title.toLowerCase();
-            const toSearch = props.target.value.toLowerCase();
+            let source, toSearch;
+            for (const key in film) {
+                source = typeof film[key] === "string" ? film[key].toLowerCase() : "";
+                toSearch = props.target.value.toLowerCase();
+                if (source.includes(toSearch)) {
+                    break;
+                }
+            }
             return source.includes(toSearch);
         });
 
@@ -118,12 +91,19 @@ const App = () => {
         if (props.target.value === "") {
             setFilms(filmsClone);
         }
+        setSearchTerm(props.target.value.toLowerCase());
     };
 
     const searchPlanet = (props) => {
         let findPlanet = planetsClone.flat().filter((planet) => {
-            const source = planet.name.toLowerCase();
-            const toSearch = props.target.value.toLowerCase();
+            let source, toSearch;
+            for (const key in planet) {
+                source = typeof planet[key] === "string" ? planet[key].toLowerCase() : "";
+                toSearch = props.target.value.toLowerCase();
+                if (source.includes(toSearch)) {
+                    break;
+                }
+            }
             return source.includes(toSearch);
         });
 
@@ -131,32 +111,36 @@ const App = () => {
         if (props.target.value === "") {
             setPlanets(planetsClone);
         }
-    };
-
-    const searchFunction = (props) => {
         setSearchTerm(props.target.value.toLowerCase());
-        searchCharacter(props);
-        searchFilm(props);
-        searchPlanet(props);
     };
 
+    /* For Loading */
     useEffect(() => {
-        if (appCache.get("characters") === undefined) {
-            getCharacter();
-        }
-
-        if (appCache.get("films") === undefined) {
-            getFilm();
-        }
-
-        if (appCache.get("planets") === undefined) {
-            getPlanet();
-        }
-
         if (characters.length !== 0 && films.length !== 0 && planets.length !== 0) {
             setIsLoading(false);
         }
-    }, [characters.length, films.length, planets.length]);
+    }, [characters, films, planets]);
+
+    /* Getting Characters Data */
+    useEffect(() => {
+        if (appCache.get("people") === undefined) {
+            getApiData("people", setCharacters, setCharactersClone);
+        }
+    }, []);
+
+    /* Getting Films Data */
+    useEffect(() => {
+        if (appCache.get("films") === undefined) {
+            getApiData("films", setFilms, setFilmsClone);
+        }
+    }, []);
+
+    /* Getting Planets Data */
+    useEffect(() => {
+        if (appCache.get("planets") === undefined) {
+            getApiData("planets", setPlanets, setPlanetsClone);
+        }
+    }, []);
 
     return (
         <>
@@ -179,7 +163,7 @@ const App = () => {
                                     filmApiData={films}
                                     planetApiData={planets}
                                     searchTerm={searchTerm}
-                                    searchFunction={searchFunction}
+                                    searchFunction={searchCharacter}
                                     isLoading={isLoading}
                                     isError={isError}
                                 />
@@ -195,7 +179,7 @@ const App = () => {
                                     filmApiData={films}
                                     planetApiData={planets}
                                     searchTerm={searchTerm}
-                                    searchFunction={searchFunction}
+                                    searchFunction={searchFilm}
                                     isLoading={isLoading}
                                     isError={isError}
                                 />
@@ -211,7 +195,7 @@ const App = () => {
                                     filmApiData={films}
                                     planetApiData={planets}
                                     searchTerm={searchTerm}
-                                    searchFunction={searchFunction}
+                                    searchFunction={searchPlanet}
                                     isLoading={isLoading}
                                     isError={isError}
                                 />

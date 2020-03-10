@@ -1,0 +1,34 @@
+.no-margin {
+    margin: 0 !important;
+}
+
+.sharp-border {
+    border-radius: 0 0 0 0 !important;
+}
+
+.center-overlay {
+    position: absolute !important;
+    top: 20% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 1000 !important;
+}
+
+.container-center {
+    text-align: center !important;
+}
+
+.semi-black-transparent {
+    background-color: rgba(0, 0, 0, 0.45) !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+@media only screen and (max-width: 1024px) {
+    .center-overlay {
+        position: initial !important;
+        top: initial !important;
+        left: initial !important;
+        transform: initial !important;
+    }
+}
