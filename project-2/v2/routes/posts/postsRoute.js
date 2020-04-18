@@ -1,6 +1,7 @@
 /* Load 3rd Party Modules */
 const express = require("express");
 const axios = require("axios");
+const bodyParser = require("../../lib/middleware/bodyParser");
 
 const getPostsId = async (req, res) => {
     let postid = req.params.postid;
@@ -34,7 +35,7 @@ const deletePosts = (req, res) => {
 /* Express Router */
 const postsRouter = express.Router();
 postsRouter.get("/:postid", getPostsId);
-postsRouter.post("/", setPosts);
+postsRouter.post("/", bodyParser.json(), setPosts);
 postsRouter.patch("/:id", updatePosts);
 postsRouter.delete("/:postid", deletePosts);
 
