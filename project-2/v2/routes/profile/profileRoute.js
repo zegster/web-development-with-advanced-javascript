@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 
 /* Load Components */
 const bodyParser = require("../../lib/middleware/bodyParser");
+const postsSchema = require("../../db/schema/postsSchema");
 const usersSchema = require("../../db/schema/usersSchema");
 
 /* Mongo Database */
@@ -69,14 +70,38 @@ const updateUsers = async (req, res) => {
     }
 };
 
-/* (DELETE) [/profile] Removes a particular user */
+/* (DELETE) [/profile] Removes a particular user (will remove all posts associate to this user) */
 const deleteUsers = async (req, res) => {
     //Connect to database
     mongoose.connect(mongoURL, mongooseOption);
 
+    //Get specific user from users collection
+    const { id } = req.body;
+    let user;
+    try {
+        user = await usersSchema.find({ id: id });
+    } catch (err) {
+        mongoose.disconnect();
+        console.log(err);
+        res.status(500);
+        res.send(err);
+    }
+
+    //Check if user exists
+    if (user.length) {
+        //Delete all posts associate with this user in posts collection
+        try {
+            await postsSchema.deleteMany({ userid: user[0]._id });
+        } catch (err) {
+            mongoose.disconnect();
+            console.log(err);
+            res.status(500);
+            res.send(err);
+        }
+    }
+
     //Delete an user in users collection
     try {
-        const { id } = req.body;
         const jsonResult = await usersSchema.deleteOne({ id: id });
         mongoose.disconnect();
         res.send(jsonResult);

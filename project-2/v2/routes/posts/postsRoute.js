@@ -41,7 +41,6 @@ const setPosts = async (req, res) => {
         user = await usersSchema.find({ id: userid });
     } catch (err) {
         mongoose.disconnect();
-        console.log("Request Body: ", req.body);
         console.log(err);
         res.status(500);
         res.send(err);
