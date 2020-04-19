@@ -10,7 +10,7 @@ const usersSchema = require("../../db/schema/usersSchema");
 const mongoURL = "mongodb://127.0.0.1:27017/jsonplaceholder";
 const mongooseOption = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true };
 
-/* (GET) [allPosts] Returns all posts for all users */
+/* (GET) [/allPosts] Returns all posts for all users */
 const getAllPosts = async (req, res) => {
     //Connect to database
     mongoose.connect(mongoURL, mongooseOption);
@@ -36,8 +36,7 @@ const getAllPostsUser = async (req, res) => {
     //Get specific user from users collection
     let user;
     try {
-        const username = req.params.username;
-        user = await usersSchema.find({ username: username });
+        user = await usersSchema.find({ username: req.params.username });
     } catch (err) {
         mongoose.disconnect();
         console.log(err);

@@ -18,8 +18,7 @@ const getPostsId = async (req, res) => {
 
     //Get specific post from posts collection by postid
     try {
-        const postid = req.params.postid;
-        const jsonResult = await postsSchema.find({ id: postid });
+        const jsonResult = await postsSchema.find({ id: req.params.postid });
         mongoose.disconnect();
         res.send(jsonResult);
     } catch (err) {
@@ -53,7 +52,7 @@ const setPosts = async (req, res) => {
         res.status(404);
         res.send("[posts]: User doesn't exist...");
     } else {
-        //Creates a new post in posts collection by userid
+        //Create a new post in posts collection by userid
         try {
             const submission = { ...req.body, userid: user[0]._id };
             const post = new postsSchema(submission);
@@ -69,21 +68,49 @@ const setPosts = async (req, res) => {
     }
 };
 
+/* (PATCH) [/posts/:id] Updates a specific post */
 const updatePosts = async (req, res) => {
-    let id = req.params.id;
-    res.send(req.body);
+    //Connect to database
+    mongoose.connect(mongoURL, mongooseOption);
+
+    //Update a post in posts collection
+    try {
+        const post = await postsSchema.find({ id: req.params.id });
+        post[0].set(req.body);
+        const jsonResult = await post[0].save();
+        mongoose.disconnect();
+        res.send(jsonResult);
+    } catch (err) {
+        mongoose.disconnect();
+        console.log(err);
+        res.status(500);
+        res.send(err);
+    }
 };
 
+/* (DELETE) [/posts/:postid] Removes a particular post */
 const deletePosts = async (req, res) => {
-    let postid = req.params.postid;
-    res.send(req.body);
+    //Connect to database
+    mongoose.connect(mongoURL, mongooseOption);
+
+    //Delete a post in posts collection
+    try {
+        const jsonResult = await postsSchema.deleteOne({ id: req.params.postid });
+        mongoose.disconnect();
+        res.send(jsonResult);
+    } catch (err) {
+        mongoose.disconnect();
+        console.log(err);
+        res.status(500);
+        res.send(err);
+    }
 };
 
 /* Express Router */
 const postsRouter = express.Router();
 postsRouter.get("/:postid", getPostsId);
 postsRouter.post("/", bodyParser.json(), setPosts);
-postsRouter.patch("/:id", updatePosts);
+postsRouter.patch("/:id", bodyParser.json(), updatePosts);
 postsRouter.delete("/:postid", deletePosts);
 
 /* Export */

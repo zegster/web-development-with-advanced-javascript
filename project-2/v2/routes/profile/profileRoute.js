@@ -11,7 +11,7 @@ const mongoURL = "mongodb://127.0.0.1:27017/jsonplaceholder";
 const mongooseOption = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true };
 
 /* (GET) [/profile/:userid] Returns a specific user by userid */
-const getUser = async (req, res) => {
+const getUsers = async (req, res) => {
     //Connect to database
     mongoose.connect(mongoURL, mongooseOption);
 
@@ -30,11 +30,11 @@ const getUser = async (req, res) => {
 };
 
 /* (POST) [/profile] Creates a new user */
-const setUser = async (req, res) => {
+const setUsers = async (req, res) => {
     //Connect to database
     mongoose.connect(mongoURL, mongooseOption);
 
-    //Creates a new user in users collection
+    //Create a new user in users collection
     try {
         const user = new usersSchema(req.body);
         const jsonResult = await user.save();
@@ -48,10 +48,52 @@ const setUser = async (req, res) => {
     }
 };
 
+/* (PATCH) [/profile] Update an existing user */
+const updateUsers = async (req, res) => {
+    //Connect to database
+    mongoose.connect(mongoURL, mongooseOption);
+
+    //Update an user in users collection
+    try {
+        const { id } = req.body;
+        const user = await usersSchema.find({ id: id });
+        user[0].set(req.body);
+        const jsonResult = await user[0].save();
+        mongoose.disconnect();
+        res.send(jsonResult);
+    } catch (err) {
+        mongoose.disconnect();
+        console.log(err);
+        res.status(500);
+        res.send(err);
+    }
+};
+
+/* (DELETE) [/profile] Removes a particular user */
+const deleteUsers = async (req, res) => {
+    //Connect to database
+    mongoose.connect(mongoURL, mongooseOption);
+
+    //Delete an user in users collection
+    try {
+        const { id } = req.body;
+        const jsonResult = await usersSchema.deleteOne({ id: id });
+        mongoose.disconnect();
+        res.send(jsonResult);
+    } catch (err) {
+        mongoose.disconnect();
+        console.log(err);
+        res.status(500);
+        res.send(err);
+    }
+};
+
 /* Express Router */
 const profileRouter = express.Router();
-profileRouter.get("/:userid", getUser);
-profileRouter.post("/", bodyParser.json(), setUser);
+profileRouter.get("/:userid", getUsers);
+profileRouter.post("/", bodyParser.json(), setUsers);
+profileRouter.patch("/", bodyParser.json(), updateUsers);
+profileRouter.delete("/", bodyParser.json(), deleteUsers);
 
 /* Export */
 module.exports = profileRouter;
