@@ -39,9 +39,9 @@ const updateUsers = async (req, res) => {
     //Update an user in users collection
     try {
         const { id } = req.body;
-        const user = await usersSchema.find({ id: id });
-        user[0].set(req.body);
-        const jsonResult = await user[0].save();
+        const user = await usersSchema.findOne({ id: id });
+        user.set(req.body);
+        const jsonResult = await user.save();
         res.send(jsonResult);
     } catch (err) {
         console.log(err);
