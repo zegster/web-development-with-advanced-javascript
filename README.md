@@ -17,6 +17,6 @@
 
 
 #### Assignments:
-- SWAPI [*NOTE:swapi.co is longer in service, thus is project may not run correctly*]
+- SWAPI [*NOTE: swapi.co is longer in service, thus is project may not run correctly*]
 - Basic Backend
 - ~~Web Service~~ [undisclosed]
